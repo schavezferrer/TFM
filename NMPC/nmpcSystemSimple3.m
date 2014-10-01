@@ -1,6 +1,6 @@
 
 
-function [allData, t, x, u] = nmpcSystemSimple
+function [allData, t, x, u] = nmpcSystemSimple3
 
     addpath('./nmpcroutine');
     clear all;
@@ -8,21 +8,26 @@ function [allData, t, x, u] = nmpcSystemSimple
     close all;
 
     mpciterations = 1; % Horizonte de prediccion
-    N             = 10; % Horizonte de control
-    T             = 0.05; % Tiempo de muestreo
+    N             = 8; % Horizonte de control
+    T             = 0.25; % Tiempo de muestreo
     tmeasure      = 0.0; 
-    posIni = [0 0 -4]; % Posición inicial del quadrotor
+    posIni = [0 0 -1]; % Posición inicial del quadrotor
     angIni = [0 0 0]; % Orientación inicial del quadrotor
     linVelIni = [0 0 0]; % Velocidad lineal inicial del quadrotor
     angVelIni = [0 0 0]; % Velocidad angular inicial del quadrotor
   
+    w0 = 855;
+    w = [w0 -w0 w0 -w0];
+    
     y0 = [0 0 0 0 0 0];
     y1 = [0 0 0 0 0 0];
     
     yAnt = [];
     
-    xmeasure = [posIni angIni linVelIni angVelIni];
-    k = 855; % Velocidad angular de los motores inicial
+    xmeasure = [posIni angIni linVelIni angVelIni w];
+    
+    k = 25; % Velocidad angular de los motores inicial
+    
     w1 = k*ones(1,N);
     w2 = -k*ones(1,N);
     w3 = k*ones(1,N);
@@ -39,7 +44,7 @@ function [allData, t, x, u] = nmpcSystemSimple
     rtol_ode_sim  = [];
     
     currTime = 0;
-    timeSim = 2;
+    timeSim = 10;
     currSample = 1;
     totalSamples = floor(timeSim/T);
 
@@ -51,7 +56,7 @@ function [allData, t, x, u] = nmpcSystemSimple
     % fprintf('--------------------------------------------------\n'); 
     % Aplico el nmpc
     
-     [t, x, u, fval] = nmpc2(@runningcosts, @terminalcosts, @constraints, ...
+     [t, x, u, fval] = nmpc3(@runningcosts, @terminalcosts, @constraints, ...
          @terminalconstraints, @linearconstraints, @system, ...
          mpciterations, N, T, tmeasure, xmeasure, u0,lastU, ...
          tol_opt, opt_option, ...
@@ -75,8 +80,8 @@ function [allData, t, x, u] = nmpcSystemSimple
     allData(currSample).currTime = tmeasure;
     allData(currSample).fval = fval;
     
-    tmeasure = currSample*T %revisar
-    xmeasure = y
+    tmeasure = currSample*T; %revisar
+    xmeasure = y;
     
     % Avanzar un paso de control para ayudar al buscador
     
@@ -121,23 +126,22 @@ end
 
 function cost = runningcosts(t, x, u, lastU)
    
-    cost =  (x(9))^2+2*(x(7)-0.5)^2;
-    cost = 0;
+    cost =   (x(3) + 1)^2 + (x(1)+1)^2 ;
+%    sum(u.^2)/100000 ;
 end
 
 function cost = terminalcosts(t, x)
-    cost = (x(9))^2+2*(x(7)-0.5)^2;
-    
+   cost = 0;   
 end
 
 function [c,ceq] = constraints(t, x, u,N)
     
-    k = 100;
-    v = 100;
-    c = [];
-    ub = [ 100 100 100 k k 1 v v 10 k k k];
+    k = 0.1;
+    v = 1;
+   
+    ub = [ 100 100 100 k k k v v 10 1 1 1 1000 -200 1000 -200];
        
-    lb = [-100 -100 -100 -k -k -1 -v -v -10 -k -k -k];
+    lb = [-100 -100 -100 -k -k -k -v -v -10 -1 -1 -1 200 -1000 200 -1000];
     
     [nothing numVar] = size(x);
     
@@ -163,7 +167,7 @@ function [c,ceq] = constraints(t, x, u,N)
         end
 
     end
-    
+
     ceq = [];
     
 end
@@ -173,13 +177,23 @@ function [c,ceq] = terminalconstraints(t, x)
     ceq = [];
 end
 
-function [A, b, Aeq, beq, lb, ub] = linearconstraints(t, x, u)
+function [A, b, Aeq, beq, lb, ub] = linearconstraints(t, x, u, lastU)
+  
+
+    A = [1-lastU(1,1)/u(1,1) 0 0 0 
+         0 1-lastU(2,1)/u(2,1) 0 0
+         0 0 1-lastU(3,1)/u(3,1) 0
+         0 0 0 1-lastU(4,1)/u(4,1)];
+     
+    k = 100;
+    b = [k k k k]; 
+    
+    b = [];
     A = [];
-    b = []; 
     Aeq = [];
     beq = []; 
-    ub = [1000  0     1000   0];
-    lb = [0    -1000  0     -1000];
+    ub = [k k k k];
+    lb = [-k -k -k -k];
 
 
 
@@ -202,7 +216,12 @@ function [y] = system(t, x, u, T)
     else state = x;   
     end
    
-    w = u;
+%     w = u;
+      
+    %UPDATE rot motor
+    
+    w = state(13:16) + u;
+   
     
     %UPDATE DYANAMICS
     
@@ -248,8 +267,10 @@ function [y] = system(t, x, u, T)
     %UPDATE ANGLES (Inertial Frame)
     ang = state(4:6) + dn*T; 
         
+  
+    
     %POST UPDATE
-    y = [pos' ang' linVel' angVel']; 
+    y = [pos' ang' linVel' angVel' w']; 
     
    
 

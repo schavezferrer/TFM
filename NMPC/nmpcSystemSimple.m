@@ -8,8 +8,8 @@ function [allData, t, x, u] = nmpcSystemSimple
     close all;
 
     mpciterations = 1; % Horizonte de prediccion
-    N             = 8; % Horizonte de control
-    T             = 0.25; % Tiempo de muestreo
+    N             =4; % Horizonte de control
+    T             = 0.5; % Tiempo de muestreo
     tmeasure      = 0.0; 
     posIni = [0 0 -4]; % Posición inicial del quadrotor
     angIni = [0 0 0]; % Orientación inicial del quadrotor
@@ -121,8 +121,9 @@ end
 
 function cost = runningcosts(t, x, u, lastU)
    
-    cost =   (x(3) + 4)^2 + (x(7) - 1.0)^2;
-    
+    cost =   (x(3) + 4)^2 + (x(7) - 0.5)^2;
+   
+   
 end
 
 function cost = terminalcosts(t, x)
@@ -172,9 +173,19 @@ function [c,ceq] = terminalconstraints(t, x)
     ceq = [];
 end
 
-function [A, b, Aeq, beq, lb, ub] = linearconstraints(t, x, u)
+function [A, b, Aeq, beq, lb, ub] = linearconstraints(t, x, u, lastU)
+  
+
+    A = [1-lastU(1,1)/u(1,1) 0 0 0 
+         0 1-lastU(2,1)/u(2,1) 0 0
+         0 0 1-lastU(3,1)/u(3,1) 0
+         0 0 0 1-lastU(4,1)/u(4,1)];
+     
+    k = 50;
+    b = [k k k k]; 
+    
+    b = [];
     A = [];
-    b = []; 
     Aeq = [];
     beq = []; 
     ub = [1000  -200     1000   -200];
