@@ -61,7 +61,7 @@ function [allData, t, x, u] = nmpcSystemSimple3
          mpciterations, N, T, tmeasure, xmeasure, u0,lastU, ...
          tol_opt, opt_option, ...
          type, atol_ode_real, rtol_ode_real, atol_ode_sim, rtol_ode_sim, ...
-         iprint, @printHeader, @printClosedloopData, @plotTrajectories)
+         iprint, @printHeader, @printClosedloopData, @plotTrajectories);
 
     % Evoluciono el sistema
    % fprintf('--------------------------------------------------\n'); 
@@ -75,7 +75,7 @@ function [allData, t, x, u] = nmpcSystemSimple3
     allData(currSample).timePredicted = t';
     allData(currSample).xPredicted = x;
     allData(currSample).uPredicted = reshape(u',4,mpciterations)';
-    allData(currSample).xReal = y;
+    allData(currSample).xReal = y
     allData(currSample).sampleTime = T;
     allData(currSample).currTime = tmeasure;
     allData(currSample).fval = fval;
@@ -126,7 +126,7 @@ end
 
 function cost = runningcosts(t, x, u, lastU)
    
-    cost =   (x(3) + 1)^2 + (x(1)+1)^2 ;
+    cost = (x(1) - 0.1)^2 + (x(2) - 0.1)^2 + (x(3) + 1)^2;
 %    sum(u.^2)/100000 ;
 end
 
@@ -148,17 +148,7 @@ function [c,ceq] = constraints(t, x, u,N)
     c = zeros(numVar*2,1);
     x(3) = -1*x(3);
     x(9) = -1*x(9);
-  %     for i = 1:2
-%         for j = 1:12*2
-%             
-%             if mod(j,2) c((i-1)*12*2+j) = x((j+1)/2)-ub((j+1)/2);
-%             else c((i-1)*12*2+j) = -x(j/2) + lb(j/2);
-%             end
-%             
-%         end
-%     end
-%     
-    
+  
     i = 1;
     for j = 1:numVar*2
 
@@ -180,23 +170,13 @@ end
 function [A, b, Aeq, beq, lb, ub] = linearconstraints(t, x, u, lastU)
   
 
-    A = [1-lastU(1,1)/u(1,1) 0 0 0 
-         0 1-lastU(2,1)/u(2,1) 0 0
-         0 0 1-lastU(3,1)/u(3,1) 0
-         0 0 0 1-lastU(4,1)/u(4,1)];
-     
     k = 100;
-    b = [k k k k]; 
-    
     b = [];
     A = [];
     Aeq = [];
     beq = []; 
     ub = [k k k k];
     lb = [-k -k -k -k];
-
-
-
 
 end
 
@@ -220,7 +200,7 @@ function [y] = system(t, x, u, T)
       
     %UPDATE rot motor
     
-    w = state(13:16) + u;
+    w = state(13:16) + u(1:4,1);
    
     
     %UPDATE DYANAMICS
@@ -232,7 +212,10 @@ function [y] = system(t, x, u, T)
    iW = [0              sin(state(6))                   cos(state(6));             %inverted Wronskian
          0              cos(state(6))*cos(state(5))     -sin(state(6))*cos(state(5));
          cos(state(5))  sin(state(6))*sin(state(5))     cos(state(6))*sin(state(5))] / cos(state(5));
-                                         
+  
+    thrust = zeros(3,4);
+    Q = thrust;
+    tau = thrust;
     for motor = 1:4
 
         thrust(:,motor) = quad.Ct*quad.rho*quad.A*quad.r^2*w(motor)^2 * [0;0;-1];
@@ -252,7 +235,7 @@ function [y] = system(t, x, u, T)
  
     totalTau = tau(:,1)+tau(:,2)+tau(:,3)+tau(:,4);
     totalDrag = Q(:,1)+Q(:,2)+Q(:,3)+Q(:,4);
-    do = inv(quad.J)*(cross(-state(10:12),quad.J*state(10:12)) + totalTau + totalDrag); % Body Frame ?
+    do = quad.J\(cross(-state(10:12),quad.J*state(10:12)) + totalTau + totalDrag); % Body Frame ?
     
     %UPDATE LINEAR VELOCITIES (Inertial Frame)
     linVel = state(7:9) + dv*T; 
@@ -353,18 +336,127 @@ function printInfo(state,allData,currSample)
     
     
     scnsize = get(0,'ScreenSize');
-    pos = [0 scnsize(4)/2 scnsize(3)/2.5 scnsize(4)/1.5];
-    graphStates(myData,pos);
-    pos = [scnsize(3)/2.5 scnsize(4) scnsize(3)/3 scnsize(4)/2];
-    graphQuadRotor(myData,pos);
+%     pos = [0 scnsize(4)/2 scnsize(3)/2.5 scnsize(4)/1.5];
+%     graphStates(myData,pos);
+%     pos = [scnsize(3)/2.5 scnsize(4) scnsize(3)/3 scnsize(4)/2];
+%     graphQuadRotor(myData,pos);
     pos = [0 0 scnsize(3)/2.5 scnsize(4)/1.5];
     graphU(allData,currSample,pos);
     pos = [scnsize(3)/2.5 0 scnsize(3)/3 scnsize(4)/2.5];
     graphFval(allData,currSample,pos);
-
+    pos = [scnsize(3)/2.5 scnsize(4) scnsize(3)/2.5 scnsize(4)/1.5];
+    graphIndividualStates(allData,currSample,pos)
     
 end
+function graphIndividualStates(allData,currSample,pos)
+    
+    myData = zeros(currSample,16);
+    for i = 1:currSample
+       myData(i,:) = allData(i).xReal(1,:);
+    end
 
+    fig = figure(5);
+    set(fig,'OuterPosition',pos) 
+   
+    subplot(6,2,1)
+    hold on
+    xlabel('Sample')
+    ylabel('Xpos')
+    grid on
+    plot(myData(:,1),'r+-')
+    drawnow
+    
+    subplot(6,2,3)
+    hold on
+    xlabel('Sample')
+    ylabel('Ypos')
+    grid on
+    plot(myData(:,2),'g+-')
+    drawnow
+    
+    subplot(6,2,5)
+    hold on
+    xlabel('Sample')
+    ylabel('Zpos')
+    grid on
+    plot(myData(:,3),'b+-')
+    drawnow
+    
+    subplot(6,2,2)
+    hold on
+    xlabel('Sample')
+    ylabel('XVel')
+    grid on
+    plot(myData(:,7),'r+-')
+    drawnow
+    
+    subplot(6,2,4)
+    hold on
+    xlabel('Sample')
+    ylabel('YVel')
+    grid on
+    plot(myData(:,8),'g+-')
+    drawnow
+    
+    subplot(6,2,6)
+    hold on
+    xlabel('Sample')
+    ylabel('ZVel')
+    grid on
+    plot(myData(:,9),'b+-')
+    drawnow
+    
+    subplot(6,2,7)
+    hold on
+    xlabel('Sample')
+    ylabel('Pitch')
+    grid on
+    plot(myData(:,4),'r+-')
+    drawnow
+    
+    subplot(6,2,9)
+    hold on
+    xlabel('Sample')
+    ylabel('Roll')
+    grid on
+    plot(myData(:,5),'g+-')
+    drawnow
+    
+    subplot(6,2,11)
+    hold on
+    xlabel('Sample')
+    ylabel('Yaw')
+    grid on
+    plot(myData(:,6),'b+-')
+    drawnow
+    
+    subplot(6,2,8)
+    hold on
+    xlabel('Sample')
+    ylabel('PitchVel')
+    grid on
+    plot(myData(:,10),'r+-')
+    drawnow
+    
+    subplot(6,2,10)
+    hold on
+    xlabel('Sample')
+    ylabel('RollVel')
+    grid on
+    plot(myData(:,11),'g+-')
+    drawnow
+    
+    subplot(6,2,12)
+    hold on
+    xlabel('Sample')
+    ylabel('YawVel')
+    grid on
+    plot(myData(:,12),'b+-')
+    drawnow
+    
+    
+   
+end
 function graphStates(myData,pos)
     
     fig = figure(1);
@@ -415,6 +507,7 @@ function graphStates(myData,pos)
     view(3)
     drawnow
     
+   
 end
 
 function graphQuadRotor(myData,pos)
@@ -488,9 +581,10 @@ end
 
 function graphU(allData, currSample,pos)
 
-    uOpt = zeros(currSample,4);
+    uOpt = zeros(currSample,8);
     for i = 1:currSample
-        uOpt(i,:) = allData(i).uPredicted(1,:);
+        uOpt(i,1:4) = allData(i).uPredicted(1,:);
+        uOpt(i,5:8) = allData(i).xReal(1,13:16);
     end
     
    
@@ -498,24 +592,45 @@ function graphU(allData, currSample,pos)
     set(fig,'OuterPosition',pos) 
 
     
-    subplot(4,1,1)
+    subplot(4,2,1)
 %     plot(1:currSample, uOpt(:,1),'ro-');
     bar(uOpt(:,1),'b')
     grid on
 
-    subplot(4,1,2)
+    subplot(4,2,3)
 %     plot(1:currSample, uOpt(:,2),'go-');
     bar(uOpt(:,2),'r')
     grid on
     
-    subplot(4,1,3)
+    subplot(4,2,5)
 %     plot(1:currSample, uOpt(:,3),'ro-');
     bar(uOpt(:,3),'b')
     grid on
     
-    subplot(4,1,4)
+    subplot(4,2,7)
 %     plot(1:currSample, uOpt(:,4),'go-');
     bar(uOpt(:,4),'r')
+    grid on
+    drawnow
+    
+     subplot(4,2,2)
+%     plot(1:currSample, uOpt(:,1),'ro-');
+    bar(uOpt(:,5),'b')
+    grid on
+
+    subplot(4,2,4)
+%     plot(1:currSample, uOpt(:,2),'go-');
+    bar(uOpt(:,6),'r')
+    grid on
+    
+    subplot(4,2,6)
+%     plot(1:currSample, uOpt(:,3),'ro-');
+    bar(uOpt(:,7),'b')
+    grid on
+    
+    subplot(4,2,8)
+%     plot(1:currSample, uOpt(:,4),'go-');
+    bar(uOpt(:,8),'r')
     grid on
     drawnow
 end

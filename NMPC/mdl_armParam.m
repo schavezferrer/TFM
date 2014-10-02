@@ -70,7 +70,7 @@ L(6) = Revolute('d', 0, 'a', 0, 'alpha', 0,  ...
 arm = SerialLink(L, 'name', 'Arm', ...
     'manufacturer', 'IRI', 'comment', 'Left Parameters');
 
-arm.payload(0.2,[0 0 0]);
+arm.payload(0,[0 0 0]);
 
 qn = [0 0 0 0 0 0];
 
