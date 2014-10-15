@@ -16,7 +16,7 @@ baseReaction = [0 0 0 0 0 0];
 jointTorques = [0 0 0 0 0 0];
 
 u = zeros(samples,6); %torque controled
-u(1:10,1) = 1;
+u(1:10,1) = 0;
 u(11:20,1) = 0;
 u(21:30,1) = 0;
 u(31:40,1) = 0;
@@ -28,7 +28,7 @@ myData(1,13:18) = accAng;
 
 for k = 1 : samples
 
-   accAng = arm.accel(ang,velAng,arm.gravload(ang)+u(k,:))
+   accAng = arm.accel(ang,velAng,arm.gravload(ang)+u(k,:));
    [jointTorques baseReaction] = arm.rne(ang,velAng,accAng');
    
    velAng = velAng + (accAng)'*Ts;

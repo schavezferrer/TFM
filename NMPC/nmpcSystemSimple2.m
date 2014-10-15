@@ -1,6 +1,6 @@
 
 
-function [allData, t, x, u] = nmpcSystemSimple3
+function [allData, t, x, u] = nmpcSystemSimple2
 
     addpath('./nmpcroutine');
     clear all;
@@ -9,25 +9,20 @@ function [allData, t, x, u] = nmpcSystemSimple3
 
     mpciterations = 1; % Horizonte de prediccion
     N             = 8; % Horizonte de control
-    T             = 0.25; % Tiempo de muestreo
+    T             = 0.5; % Tiempo de muestreo
     tmeasure      = 0.0; 
     posIni = [0 0 -4]; % Posición inicial del quadrotor
     angIni = [0 0 0]; % Orientación inicial del quadrotor
     linVelIni = [0 0 0]; % Velocidad lineal inicial del quadrotor
     angVelIni = [0 0 0]; % Velocidad angular inicial del quadrotor
   
-    w0 = 855;
-    w = [w0 -w0 w0 -w0];
-    
     y0 = [0 0 0 0 0 0];
     y1 = [0 0 0 0 0 0];
     
     yAnt = [];
     
-    xmeasure = [posIni angIni linVelIni angVelIni w];
-    
-    k = 25; % Velocidad angular de los motores inicial
-    
+    xmeasure = [posIni angIni linVelIni angVelIni];
+    k = 855; % Velocidad angular de los motores inicial
     w1 = k*ones(1,N);
     w2 = -k*ones(1,N);
     w3 = k*ones(1,N);
@@ -56,12 +51,12 @@ function [allData, t, x, u] = nmpcSystemSimple3
     % fprintf('--------------------------------------------------\n'); 
     % Aplico el nmpc
     
-     [t, x, u, fval] = nmpc3(@runningcosts, @terminalcosts, @constraints, ...
+     [t, x, u, fval] = nmpc2(@runningcosts, @terminalcosts, @constraints, ...
          @terminalconstraints, @linearconstraints, @system, ...
          mpciterations, N, T, tmeasure, xmeasure, u0,lastU, ...
          tol_opt, opt_option, ...
          type, atol_ode_real, rtol_ode_real, atol_ode_sim, rtol_ode_sim, ...
-         iprint, @printHeader, @printClosedloopData, @plotTrajectories);
+         iprint, @printHeader, @printClosedloopData, @plotTrajectories)
 
     % Evoluciono el sistema
    % fprintf('--------------------------------------------------\n'); 
@@ -75,7 +70,7 @@ function [allData, t, x, u] = nmpcSystemSimple3
     allData(currSample).timePredicted = t';
     allData(currSample).xPredicted = x;
     allData(currSample).uPredicted = reshape(u',4,mpciterations)';
-    allData(currSample).xReal = y
+    allData(currSample).xReal = y;
     allData(currSample).sampleTime = T;
     allData(currSample).currTime = tmeasure;
     allData(currSample).fval = fval;
@@ -124,11 +119,14 @@ end
 
 % Function
 
-function cost = runningcosts(t, x, u, lastU)
-   
-    cost = (x(1) - 0.5)^2 + (x(2) - 0.5)^2 + (x(3) + 4)^2;
-%    sum(u.^2)/100000 ;
-end
+% function cost = runningcosts(t, x, u, lastU)
+%    
+%     cost =   (x(3) + 4)^2 + (x(1) - 0.5)^2;
+%     
+%     cost = (x(1) - 1)^2 + (x(2) - 1)^2 + 1.5*(x(3) + 4)^2;
+%    
+%    
+% end
 
 function cost = terminalcosts(t, x)
    cost = 0;   
@@ -139,9 +137,9 @@ function [c,ceq] = constraints(t, x, u,N)
     k = 0.1;
     v = 1;
    
-    ub = [ 100 100 100 k k k v v 10 1 1 1 1000 -200 1000 -200];
+    ub = [ 100 100 100 k k k v v 10 1 1 1 ];
        
-    lb = [-100 -100 -100 -k -k -k -v -v -10 -1 -1 -1 200 -1000 200 -1000];
+    lb = [-100 -100 -100 -k -k -k -v -v -10 -1 -1 -1];
     
     [nothing numVar] = size(x);
     
@@ -159,7 +157,8 @@ function [c,ceq] = constraints(t, x, u,N)
     end
 
     ceq = [];
-    
+
+
 end
 
 function [c,ceq] = terminalconstraints(t, x)
@@ -170,13 +169,27 @@ end
 function [A, b, Aeq, beq, lb, ub] = linearconstraints(t, x, u, lastU)
   
 
+    A = [1 0 0 0;
+         -1 0 0 0
+         0 1 0 0;
+         0 -1 0 0;
+         0 0 1 0;
+         0 0 -1 0;
+         0 0 0 1;
+         0 0 0 -1];
+   
     k = 100;
-    b = [];
-    A = [];
+    b = [k+lastU(1,1) k-lastU(1,1) k+lastU(2,1) k-lastU(2,1) k+lastU(3,1) k-lastU(3,1) k+lastU(4,1) k-lastU(4,1)]; 
+    
+%     b = [];
+%     A = [];
     Aeq = [];
     beq = []; 
-    ub = [k k k k];
-    lb = [-k -k -k -k];
+    ub = [1000  -200     1000   -200];
+    lb = [200    -1000  200     -1000];
+
+
+
 
 end
 
@@ -184,6 +197,8 @@ function [y] = system(t, x, u, T)
   
     
     mdl_quadcopterParam
+    
+    mdl_armParam
 
     D(:,1) = [quad.d;0;quad.h];          %Di         Rotor hub displacements             1x3
     D(:,2) = [0;quad.d;quad.h];
@@ -196,14 +211,9 @@ function [y] = system(t, x, u, T)
     else state = x;   
     end
    
-%     w = u;
-      
-    %UPDATE rot motor
+    w = u;
     
-    w = state(13:16) + u(1:4,1);
-   
-    
-    %UPDATE DYANAMICS
+    %UPDATE DYANAMICS QUADROTOR
     
     R = [cos(state(5))*cos(state(4))    sin(state(6))*sin(state(5))*cos(state(4))-cos(state(6))*sin(state(4))   cos(state(6))*sin(state(5))*cos(state(4))+sin(state(6))*sin(state(4));   %BBF > Inertial rotation matrix
          cos(state(5))*sin(state(4))    sin(state(6))*sin(state(5))*sin(state(4))+cos(state(6))*cos(state(4))   cos(state(6))*sin(state(5))*sin(state(4))-sin(state(6))*cos(state(4));
@@ -212,10 +222,7 @@ function [y] = system(t, x, u, T)
    iW = [0              sin(state(6))                   cos(state(6));             %inverted Wronskian
          0              cos(state(6))*cos(state(5))     -sin(state(6))*cos(state(5));
          cos(state(5))  sin(state(6))*sin(state(5))     cos(state(6))*sin(state(5))] / cos(state(5));
-  
-    thrust = zeros(3,4);
-    Q = thrust;
-    tau = thrust;
+                                         
     for motor = 1:4
 
         thrust(:,motor) = quad.Ct*quad.rho*quad.A*quad.r^2*w(motor)^2 * [0;0;-1];
@@ -224,6 +231,7 @@ function [y] = system(t, x, u, T)
    
     end
     
+  
     %Derivative
     
     dz =  eye(3)*state(7:9);
@@ -235,7 +243,7 @@ function [y] = system(t, x, u, T)
  
     totalTau = tau(:,1)+tau(:,2)+tau(:,3)+tau(:,4);
     totalDrag = Q(:,1)+Q(:,2)+Q(:,3)+Q(:,4);
-    do = quad.J\(cross(-state(10:12),quad.J*state(10:12)) + totalTau + totalDrag); % Body Frame ?
+    do = inv(quad.J)*(cross(-state(10:12),quad.J*state(10:12)) + totalTau + totalDrag); % Body Frame ?
     
     %UPDATE LINEAR VELOCITIES (Inertial Frame)
     linVel = state(7:9) + dv*T; 
@@ -250,10 +258,8 @@ function [y] = system(t, x, u, T)
     %UPDATE ANGLES (Inertial Frame)
     ang = state(4:6) + dn*T; 
         
-  
-    
     %POST UPDATE
-    y = [pos' ang' linVel' angVel' w']; 
+    y = [pos' ang' linVel' angVel']; 
     
    
 
@@ -336,10 +342,6 @@ function printInfo(state,allData,currSample)
     
     
     scnsize = get(0,'ScreenSize');
-%     pos = [0 scnsize(4)/2 scnsize(3)/2.5 scnsize(4)/1.5];
-%     graphStates(myData,pos);
-%     pos = [scnsize(3)/2.5 scnsize(4) scnsize(3)/3 scnsize(4)/2];
-%     graphQuadRotor(myData,pos);
     pos = [0 0 scnsize(3)/2.5 scnsize(4)/1.5];
     graphU(allData,currSample,pos);
     pos = [scnsize(3)/2.5 0 scnsize(3)/3 scnsize(4)/2.5];
@@ -350,7 +352,7 @@ function printInfo(state,allData,currSample)
 end
 function graphIndividualStates(allData,currSample,pos)
     
-    myData = zeros(currSample,16);
+    myData = zeros(currSample,12);
     for i = 1:currSample
        myData(i,:) = allData(i).xReal(1,:);
     end
@@ -584,7 +586,7 @@ function graphU(allData, currSample,pos)
     uOpt = zeros(currSample,8);
     for i = 1:currSample
         uOpt(i,1:4) = allData(i).uPredicted(1,:);
-        uOpt(i,5:8) = allData(i).xReal(1,13:16);
+%         uOpt(i,5:8) = allData(i).xReal(1,13:16);
     end
     
    
@@ -613,26 +615,26 @@ function graphU(allData, currSample,pos)
     grid on
     drawnow
     
-     subplot(4,2,2)
-%     plot(1:currSample, uOpt(:,1),'ro-');
-    bar(uOpt(:,5),'b')
-    grid on
+%      subplot(4,2,2)
+% %     plot(1:currSample, uOpt(:,1),'ro-');
+%     bar(uOpt(:,5),'b')
+%     grid on
 
-    subplot(4,2,4)
-%     plot(1:currSample, uOpt(:,2),'go-');
-    bar(uOpt(:,6),'r')
-    grid on
-    
-    subplot(4,2,6)
+%     subplot(4,2,4)
+% %     plot(1:currSample, uOpt(:,2),'go-');
+%     bar(uOpt(:,6),'r')
+%     grid on
+%     
+%     subplot(4,2,6)
 %     plot(1:currSample, uOpt(:,3),'ro-');
-    bar(uOpt(:,7),'b')
-    grid on
+%     bar(uOpt(:,7),'b')
+%     grid on
     
-    subplot(4,2,8)
+%     subplot(4,2,8)
 %     plot(1:currSample, uOpt(:,4),'go-');
-    bar(uOpt(:,8),'r')
-    grid on
-    drawnow
+%     bar(uOpt(:,8),'r')
+%     grid on
+%     drawnow
 end
 
 function graphFval(allData, currSample,pos)
@@ -651,5 +653,4 @@ function graphFval(allData, currSample,pos)
     drawnow
 
 end
-
-
+    
