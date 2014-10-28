@@ -5,8 +5,8 @@ close all
 
 mdl_armParam
 
-Ts = 0.25; % seconds
-timeSim = 10; % seconds
+Ts = 0.5; % seconds
+timeSim = 20; % seconds
 samples = floor(timeSim / Ts);
 
 ang = [0 0 0 0 0 0];
@@ -16,10 +16,8 @@ baseReaction = [0 0 0 0 0 0];
 jointTorques = [0 0 0 0 0 0];
 
 u = zeros(samples,6); %torque controled
-u(1:10,1) = 0;
-u(11:20,1) = 0;
-u(21:30,1) = 0;
-u(31:40,1) = 0;
+% u(:,1) = 0.25;
+
 myData = zeros(samples,18+6+1);
 
 myData(1,1:6) = ang;
@@ -27,12 +25,24 @@ myData(1,7:12) = velAng;
 myData(1,13:18) = accAng;
 
 for k = 1 : samples
+%    velAng = u(k,:);
+   
+    if(k > 0 && k < 3)
+        u(k,1) = 0.5;
+    elseif(k > 15 && k < 18)
+        u(k,1) = -0.5;
+    end
+        
 
-   accAng = arm.accel(ang,velAng,arm.gravload(ang)+u(k,:));
-   [jointTorques baseReaction] = arm.rne(ang,velAng,accAng');
+   accAng = arm.accel(ang,velAng,arm.gravload(ang)+u(k,:)*1);
+%    [jointTorques baseReaction] = arm.rne(ang,velAng,accAng');
    
    velAng = velAng + (accAng)'*Ts;
    ang = ang + velAng*Ts;
+   accAng = arm.accel(ang,velAng,arm.gravload(ang)+u(k,:)*1);
+
+   [jointTorques baseReaction] = arm.rne(ang,velAng,accAng');
+
    
    myData(k+1,1:6) = ang;
    myData(k+1,7:12) = velAng;
@@ -111,8 +121,8 @@ for k = 1 : 6
     
 end
 
-
-
+% 
+% 
 % hold on
 % arm.plot(ang);
 

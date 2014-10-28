@@ -1,6 +1,6 @@
 
 
-function [allData, t, x, u] = nmpcSystemSimpleArm
+function [allData, t, x, u] = nmpcSystemArm
 
     addpath('./nmpcroutine');
     clear all;
@@ -39,19 +39,62 @@ function [allData, t, x, u] = nmpcSystemSimpleArm
     rtol_ode_sim  = [];
     
     currTime = 0;
-    timeSim = 10;
+    timeSim = 40;
     currSample = 1;
     totalSamples = floor(timeSim/T);
 
     allData =  repmat(struct('timePredicted',{},'xPredicted',{}, ...
         'uPredicted',{},'xReal',{},'sampleTime',{},'currTime',{},...
-        'fval',{} , 'armPerturbance', {}),totalSamples, 1 );
+        'fval',{} , 'armPerturbance', {},'totalTau',{},...
+        'armStates',{}),totalSamples, 1 );
     lastU = u0(1:4,1);
-    baseReaction = zeros(6,1);
+    
+
     mdl_armParam;
+    
+    ang = [0 0 0 0 0 0];
+    velAng = [0 0 0 0 0 0];
+    baseReaction = zeros(6,totalSamples);
+    controlSignal = zeros(6,totalSamples);
+    
+   for k = 1 : totalSamples
+
+        if(k > 0 && k < 3)
+            controlSignal(1,k) = 0.5;
+        elseif(k > 15 && k < 18)
+            controlSignal(1,k) = -0.5;
+        end
+        
+        [ang, velAng,accAng,reaction] = armPerturbation( ang, velAng, controlSignal(:,k)', T, arm);
+   
+        baseReaction(:,k) = reaction;
+        armState = [ang velAng accAng'];
+        
+        allData(k).armPerturbance = baseReaction(:,k);
+        allData(k).armStates = armState;
+        
+        
+       
+   end
+   
+   scnsize = get(0,'ScreenSize');
+   
+   pos = [scnsize(3)*0.5 scnsize(4) scnsize(3)/2.5 scnsize(4)/1.5];
+     
+   graphArmReaction(allData,totalSamples,pos,4);
+   
+   graphArmStates(allData,totalSamples,pos,6);
+    
+   
+   
     while currTime <= timeSim
     % fprintf('--------------------------------------------------\n'); 
     % Aplico el nmpc
+    
+%     uArm = zeros(1,6); %torque controled
+%     if(currTime <= 1) uArm(1,1) = 0.1; end 
+%     [ang, velAng, baseReaction] = armPerturbation(ang,velAng,uArm,T,arm);
+
     
      [t, x, u, fval] = nmpcArm(@runningcosts, @terminalcosts, @constraints, ...
          @terminalconstraints, @linearconstraints, @mdlSystem, ...
@@ -63,9 +106,9 @@ function [allData, t, x, u] = nmpcSystemSimpleArm
     % Evoluciono el sistema
    % fprintf('--------------------------------------------------\n'); 
     %fprintf('Evolucionando el Sistema\n');
-    y = mdlSystem(t,x(1,:),u(1:4,1),T,baseReaction);
+    [y,totalTau] = mdlSystem(t,x(1,:),u(1:4,1),T,baseReaction);
     
-    
+    baseReaction(4:6,k)
     % Actualizo las variables para el nmpc
     %fprintf('--------------------------------------------------\n'); 
     %fprintf('Actualizando variables del nmpc\n');
@@ -76,8 +119,8 @@ function [allData, t, x, u] = nmpcSystemSimpleArm
     allData(currSample).sampleTime = T;
     allData(currSample).currTime = tmeasure;
     allData(currSample).fval = fval;
-    allData(currSample).armPerturbance = baseReaction;
-    
+    allData(currSample).totalTau = totalTau;
+
     tmeasure = currSample*T; %revisar
     xmeasure = y;
     
@@ -109,18 +152,14 @@ function [allData, t, x, u] = nmpcSystemSimpleArm
     currTime = tmeasure;
     lastU = u(1:4,1);
     printInfo(y,allData,currSample-1); 
+%     
+%     uArm = zeros(1,6); %torque controled
+%     uArm(1,1) = 0; 
+%     
+%     [ang, velAng, baseReaction] = armPerturbation(ang,velAng,uArm,T,arm);
     
-    
-    ang = [0 0 0 0 0 0];
-    velAng = [0 0 0 0 0 0];
-    accAng = [0 0 0 0 0 0];
-    baseReaction = [0 0 0 0 0 0];
-    jointTorques = [0 0 0 0 0 0];
-        
-    uArm = zeros(1,6); %torque controled
-
-    accAng = arm.accel(ang,velAng,arm.gravload(ang)+uArm(1,:));
-    [jointTorques baseReaction] = arm.rne(ang,velAng,accAng');
+%     accAng = arm.accel(ang,velAng,arm.gravload(ang)+uArm(1,:));
+%     [jointTorques baseReaction] = arm.rne(ang,velAng,accAng');
 
     
     
@@ -197,7 +236,7 @@ function [A, b, Aeq, beq, lb, ub] = linearconstraints(t, x, u, lastU)
          0 0 0 1;
          0 0 0 -1];
    
-    k = 100;
+    k = 200;
     b = [k+lastU(1,1) k-lastU(1,1) k+lastU(2,1) k-lastU(2,1) k+lastU(3,1) k-lastU(3,1) k+lastU(4,1) k-lastU(4,1)]; 
     
 %     b = [];
@@ -212,78 +251,6 @@ function [A, b, Aeq, beq, lb, ub] = linearconstraints(t, x, u, lastU)
 
 end
 
-% function [y] = system(t, x, u, T, baseReaction)
-%   
-%     
-%     mdl_quadcopterParam
-%     
-%     D = zeros(3,4);
-%     D(:,1) = [quad.d;0;quad.h];          %Di         Rotor hub displacements             1x3
-%     D(:,2) = [0;quad.d;quad.h];
-%     D(:,3) = [-quad.d;0;quad.h];
-%     D(:,4) = [0;-quad.d;quad.h];
-%    
-%     [r c] = size(x);
-%     
-%     if(c > 1) state = x';
-%     else state = x;   
-%     end
-%    
-%     w = u;
-%     
-%     UPDATE DYANAMICS QUADROTOR
-%     
-%     R = [cos(state(5))*cos(state(4))    sin(state(6))*sin(state(5))*cos(state(4))-cos(state(6))*sin(state(4))   cos(state(6))*sin(state(5))*cos(state(4))+sin(state(6))*sin(state(4));   %BBF > Inertial rotation matrix
-%          cos(state(5))*sin(state(4))    sin(state(6))*sin(state(5))*sin(state(4))+cos(state(6))*cos(state(4))   cos(state(6))*sin(state(5))*sin(state(4))-sin(state(6))*cos(state(4));
-%          -sin(state(5))                 sin(state(6))*cos(state(5))                                             cos(state(6))*cos(state(5))];
-% 
-%    iW = [0              sin(state(6))                   cos(state(6));             %inverted Wronskian
-%          0              cos(state(6))*cos(state(5))     -sin(state(6))*cos(state(5));
-%          cos(state(5))  sin(state(6))*sin(state(5))     cos(state(6))*sin(state(5))] / cos(state(5));
-%                                          
-%     for motor = 1:4
-% 
-%         thrust(:,motor) = quad.Ct*quad.rho*quad.A*quad.r^2*w(motor)^2 * [0;0;-1];
-%         Q(:,motor) = -quad.Cq*quad.rho*quad.A*quad.r^3*w(motor)*abs(w(motor)) * [0;0;1];     %Rotor drag torque - note that this preserves w(i) direction sign
-%         tau(:,motor) = cross(thrust(:,motor),D(:,motor));    %Torque due to rotor thrust
-%    
-%     end
-%     
-%     
-%     Derivative
-%     
-%     dz =  eye(3)*state(7:9);
-%     
-%     dn = iW*state(10:12); % Inertial frame
-%     
-%     totalThrust = thrust(:,1) + thrust(:,2) + thrust(:,3) + thrust(:,4)  + baseReaction(1:3);
-%     
-%     dv = (quad.g*[0;0;1]  + R*(1/quad.M)*totalThrust); % Inertial Frame
-%  
-%     totalTau = tau(:,1)+tau(:,2)+tau(:,3)+tau(:,4);
-%     totalDrag = Q(:,1)+Q(:,2)+Q(:,3)+Q(:,4);
-%     
-%     do = inv(quad.J)*(cross(-state(10:12),quad.J*state(10:12)) + totalTau + totalDrag + baseReaction(4:6)); % Body Frame ?
-%     
-%     UPDATE LINEAR VELOCITIES (Inertial Frame)
-%     linVel = state(7:9) + dv*T; 
-%     
-%     UPDATE ANGLES (Body Frame)
-%  
-%     angVel = state(10:12) + do*T;
-%     
-%     UPDATE POSITIONS (Inertial Frame)
-%     pos = state(1:3) + dz*T;
-%     
-%     UPDATE ANGLES (Inertial Frame)
-%     ang = state(4:6) + dn*T; 
-%         
-%     POST UPDATE
-%     y = [pos' ang' linVel' angVel']; 
-%     
-%    
-% 
-% end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -372,8 +339,11 @@ function printInfo(state,allData,currSample)
     pos = [scnsize(3)*0 scnsize(4) scnsize(3)/2.5 scnsize(4)/1.5];
     graphIndividualStates(allData,currSample,pos,3)
     
-    pos = [scnsize(3)*0.5 scnsize(4) scnsize(3)/2.5 scnsize(4)/1.5];
-    graphArmReaction(allData,currSample,pos,4);
+%     pos = [scnsize(3)*0.5 scnsize(4) scnsize(3)/2.5 scnsize(4)/1.5];
+%     graphArmReaction(allData,currSample,pos,4);
+    
+    pos = [scnsize(3)*0.5 0 scnsize(3)/3 scnsize(4)/2.5];
+    graphTotalTau(allData,currSample,pos,5);
     
     
 end
@@ -716,6 +686,40 @@ function graphArmReaction(allData, currSample,pos,numFig)
 end
 
 
+function graphTotalTau(allData, currSample,pos,numFig)
+
+    totalTau = zeros(currSample,8);
+    for i = 1:currSample
+        totalTau(i,1:3) = allData(i).totalTau(:);
+    end
+    
+   
+    fig = figure(numFig);
+    
+     
+    subplot(3,1,1)
+    grid on
+    ylabel('Torque Reaction X')
+    hold on
+    plot(totalTau(:,1),'r')
+
+    subplot(3,1,2)
+    grid on
+    ylabel('Torque Reaction Y')
+    hold on
+    plot(totalTau(:,2),'g')
+
+    subplot(3,1,3)
+    grid on
+    ylabel('Torque Reaction Z')
+    hold on
+    plot(totalTau(:,3),'b')
+
+  
+    drawnow
+
+end
+
 function graphFval(allData, currSample,pos,numFig)
 
     fval = zeros(currSample,1);
@@ -731,5 +735,48 @@ function graphFval(allData, currSample,pos,numFig)
     grid on
     drawnow
 
+end
+
+function graphArmStates(allData, currSample,pos,numFig)
+
+    armStates = zeros(currSample,18);
+    
+    for i = 1:currSample
+      armStates(i,:) = allData(i).armStates;
+    end
+    armStates
+    figure(numFig) 
+    
+    
+        
+        for k = 1 : 6
+
+            for j = 1:3
+
+                subplot(6,3,j+(k-1)*3)
+                grid on
+                hold on
+                if j == 1 
+
+                    plot(armStates(:,k),'r') 
+
+                end
+                if j == 2
+
+                    plot(armStates(:,k+6),'g')
+
+                end
+                if j == 3
+
+                    plot(armStates(:,k+12),'b')
+
+                end
+
+            end
+
+        end 
+   
+    
+    drawnow
 end
     

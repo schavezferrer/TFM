@@ -66,7 +66,7 @@ quad.rho = 1.184;                %   rho     Density of air                     
 quad.muv = 1.5e-5;               %   muv     Viscosity of air                    1x1
 
 % Airframe
-quad.M = 4;                      %   M       Mass                                1x1
+quad.M = 4+0.12;                      %   M       Mass                                1x1
 Ixx = 1.24;
 Iyy = 1.24;
 Izz = 2.48;%0.160;

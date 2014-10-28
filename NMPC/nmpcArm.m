@@ -340,6 +340,7 @@ function [t, x, u, fval] = nmpcArm(runningcosts, terminalcosts, ...
         u0 = shiftHorizon(u_new);
         % Step (3) of the NMPC algorithm:
         %   Apply control to process
+        t0
         [tmeasure, xmeasure] = applyControl(system, T, t0, x0, u_new,baseReaction, ...
             atol_ode_real, rtol_ode_real, type);
         mpciter = mpciter+1;
@@ -439,10 +440,11 @@ end
 function x = computeOpenloopSolution(system, N, T, t0, x0, u,baseReaction, ...
                                      atol_ode_sim, rtol_ode_sim, type)
     x(1,:) = x0;
+   
     for k=1:N
         
 %         u(4*k-3:4*k,1)
-        x(k+1,:) = dynamic(system, T, t0, x(k,:), u(:,k),baseReaction, ...
+        x(k+1,:) = dynamic(system, T, t0+k*T, x(k,:), u(:,k),baseReaction, ...
                              atol_ode_sim, rtol_ode_sim, type);
     end
 end
@@ -450,6 +452,7 @@ end
 function [x, t_intermediate, x_intermediate] = dynamic(system, T, t0, ...
              x0, u, baseReaction, atol_ode, rtol_ode, type)
     if ( strcmp(type, 'difference equation') )
+        
         x = system(t0, x0, u, T,baseReaction);
         x_intermediate = [x0; x];
         t_intermediate = [t0, t0+T];
