@@ -9,7 +9,7 @@ function [allData, t, x, u] = nmpcSystemArm
 
     mpciterations = 1; % Horizonte de prediccion
     N             = 8; % Horizonte de control
-    T             = 0.5; % Tiempo de muestreo
+    T             = 2/N; % Tiempo de muestreo
     tmeasure      = 0.0; 
     posIni = [0 0 -4]; % Posición inicial del quadrotor
     angIni = [0 0 0]; % Orientación inicial del quadrotor
@@ -39,7 +39,7 @@ function [allData, t, x, u] = nmpcSystemArm
     rtol_ode_sim  = [];
     
     currTime = 0;
-    timeSim = 40;
+    timeSim = 20;
     currSample = 1;
     totalSamples = floor(timeSim/T);
 
@@ -54,15 +54,20 @@ function [allData, t, x, u] = nmpcSystemArm
     
     ang = [0 0 0 0 0 0];
     velAng = [0 0 0 0 0 0];
-    baseReaction = zeros(6,totalSamples);
-    controlSignal = zeros(6,totalSamples);
+    baseReaction = zeros(6,totalSamples+N);
+    controlSignal = zeros(6,totalSamples+N);
     
-   for k = 1 : totalSamples
-
-        if(k > 0 && k < 3)
-            controlSignal(1,k) = 0.5;
-        elseif(k > 15 && k < 18)
-            controlSignal(1,k) = -0.5;
+   for k = 1 : totalSamples+N
+% 
+%         if(k > 0 && k < 9)
+%             controlSignal(1,k) = 0.25;
+% %         elseif(k > 15 && k < 18)
+% %             controlSignal(1,k) = -0.05;
+%         end
+        if(k > 1 && k < 10)
+            controlSignal(1,k) = controlSignal(1,k-1) + (0.25 -  controlSignal(1,k-1))*T;
+        elseif(k >= 10 && k < 20)
+            controlSignal(1,k) = controlSignal(1,k-1) + (0.0 -  controlSignal(1,k-1))*T;
         end
         
         [ang, velAng,accAng,reaction] = armPerturbation( ang, velAng, controlSignal(:,k)', T, arm);
@@ -108,7 +113,6 @@ function [allData, t, x, u] = nmpcSystemArm
     %fprintf('Evolucionando el Sistema\n');
     [y,totalTau] = mdlSystem(t,x(1,:),u(1:4,1),T,baseReaction);
     
-    baseReaction(4:6,k)
     % Actualizo las variables para el nmpc
     %fprintf('--------------------------------------------------\n'); 
     %fprintf('Actualizando variables del nmpc\n');
@@ -236,15 +240,17 @@ function [A, b, Aeq, beq, lb, ub] = linearconstraints(t, x, u, lastU)
          0 0 0 1;
          0 0 0 -1];
    
-    k = 200;
+    k = 150;
     b = [k+lastU(1,1) k-lastU(1,1) k+lastU(2,1) k-lastU(2,1) k+lastU(3,1) k-lastU(3,1) k+lastU(4,1) k-lastU(4,1)]; 
     
 %     b = [];
 %     A = [];
+    min = 200;
+    max = 2000;
     Aeq = [];
     beq = []; 
-    ub = [1000  -200     1000   -200];
-    lb = [200    -1000  200     -1000];
+    ub = [max  -min  max  -min];
+    lb = [min  -max  min  -max];
 
 
 
@@ -744,7 +750,6 @@ function graphArmStates(allData, currSample,pos,numFig)
     for i = 1:currSample
       armStates(i,:) = allData(i).armStates;
     end
-    armStates
     figure(numFig) 
     
     

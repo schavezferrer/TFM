@@ -33,13 +33,14 @@ for k = 1 : samples
         u(k,1) = -0.5;
     end
         
-
-   accAng = arm.accel(ang,velAng,arm.gravload(ang)+u(k,:)*1);
+   c = arm.coriolis(ang, velAng);
+%    c*velAng'
+   
+   accAng = arm.accel(ang,velAng,arm.gravload(ang)+u(k,:)*1 + (c*velAng')');
 %    [jointTorques baseReaction] = arm.rne(ang,velAng,accAng');
    
    velAng = velAng + (accAng)'*Ts;
    ang = ang + velAng*Ts;
-   accAng = arm.accel(ang,velAng,arm.gravload(ang)+u(k,:)*1);
 
    [jointTorques baseReaction] = arm.rne(ang,velAng,accAng');
 

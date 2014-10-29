@@ -2,7 +2,7 @@
 
 function [y,ttt] = mdlSystem(t, x, u, T, baseReaction)
   
-    currSample = t/T + 1; 
+    currSample = t/T + 1;
     
     mdl_quadcopterParam
 
