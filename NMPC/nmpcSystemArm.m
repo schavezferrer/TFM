@@ -22,11 +22,11 @@ function [allData, t, x, u] = nmpcSystemArm
     yAnt = [];
     
     xmeasure = [posIni angIni linVelIni angVelIni];
-    k = 855; % Velocidad angular de los motores inicial
-    w1 = k*ones(1,N);
-    w2 = -k*ones(1,N);
-    w3 = k*ones(1,N);
-    w4 = -k*ones(1,N);
+    k = 900; % Velocidad angular de los motores inicial
+    w1 = 940*ones(1,N);
+    w2 = -870*ones(1,N);
+    w3 = 865*ones(1,N);
+    w4 = -873*ones(1,N);
     u0 = [w1;w2;w3;w4];
     
     iprint        = 5;
@@ -56,6 +56,9 @@ function [allData, t, x, u] = nmpcSystemArm
     velAng = [0 0 0 0 0 0];
     baseReaction = zeros(6,totalSamples+N);
     controlSignal = zeros(6,totalSamples+N);
+    e1 = 0;
+    e2 = 0;
+    e3 = 0;
     
    for k = 1 : totalSamples+N
 % 
@@ -64,11 +67,38 @@ function [allData, t, x, u] = nmpcSystemArm
 % %         elseif(k > 15 && k < 18)
 % %             controlSignal(1,k) = -0.05;
 %         end
-        if(k > 1 && k < 10)
-            controlSignal(1,k) = controlSignal(1,k-1) + (0.25 -  controlSignal(1,k-1))*T;
-        elseif(k >= 10 && k < 20)
-            controlSignal(1,k) = controlSignal(1,k-1) + (0.0 -  controlSignal(1,k-1))*T;
-        end
+
+%         if(k > 1 && k < 15)
+%             controlSignal(1,k) = controlSignal(1,k-1) + (0.25 -  controlSignal(1,k-1))*T;
+%         elseif(k >= 15 && k < 25)
+%             controlSignal(1,k) = controlSignal(1,k-1) + (0 -  controlSignal(1,k-1))*T;
+%         end
+        
+%         if(k > 1 && k < 15)
+%             controlSignal(1,k) = (1 -  velAng(1))*0.1 + (1 -  velAng(1))*T;
+%         elseif(k >= 15)
+%             controlSignal(1,k) = (0 -  velAng(1))*0.1 + (0 -  velAng(1))*T;
+%         end
+%         
+%           
+            e3 = (0-ang(1)) - e1;
+            e1 = (0-ang(1));
+            e2 = e2 + e1*T;
+            
+            
+            vel = 5*e1 + 0.01*e2 + 10*e3/T;
+            
+            
+            controlSignal(1,k) = (vel -velAng(1))*0.01;
+            
+            %             controlSignal(1,k)
+            
+%         elseif(k >= 15)
+%             controlSignal(1,k) = (0 -  ang(1))*0.001 + 5*(0 -  ang(1))*T;
+       
+        
+        
+        
         
         [ang, velAng,accAng,reaction] = armPerturbation( ang, velAng, controlSignal(:,k)', T, arm);
    
