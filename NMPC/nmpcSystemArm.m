@@ -9,7 +9,7 @@ function [allData, t, x, u] = nmpcSystemArm
 
     mpciterations = 1; % Horizonte de prediccion
     N             = 8; % Horizonte de control
-    T             = 2/N; % Tiempo de muestreo
+    T             = 4/N; % Tiempo de muestreo
     tmeasure      = 0.0; 
     posIni = [0 0 -4]; % Posición inicial del quadrotor
     angIni = [0 0 0]; % Orientación inicial del quadrotor
@@ -81,15 +81,21 @@ function [allData, t, x, u] = nmpcSystemArm
 %         end
 %         
 %           
-            e3 = (0-ang(1)) - e1;
-            e1 = (0-ang(1));
+            e3 = (3-ang(1)) - e1;
+            e1 = (3-ang(1));
             e2 = e2 + e1*T;
             
             
-            vel = 5*e1 + 0.01*e2 + 10*e3/T;
+            vel = 50*e1 + 0*e2 + 50*e3/T;
             
             
-            controlSignal(1,k) = (vel -velAng(1))*0.01;
+            newSignal = (vel -velAng(1))*0.05;
+            maxVal = 0.75;
+            if ( newSignal > maxVal) newSignal = maxVal;
+            elseif ( newSignal < -maxVal) newSignal = -maxVal;
+            end
+                
+            controlSignal(1,k) = newSignal
             
             %             controlSignal(1,k)
             
@@ -105,7 +111,7 @@ function [allData, t, x, u] = nmpcSystemArm
         baseReaction(:,k) = reaction;
         armState = [ang velAng accAng'];
         
-        allData(k).armPerturbance = baseReaction(:,k);
+        allData(k).armPerturbance = [baseReaction(1:3,k)/1 baseReaction(4:6,k)];
         allData(k).armStates = armState;
         
         
