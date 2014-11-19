@@ -27,6 +27,11 @@ function [allData, t, x, u] = nmpcSystemArm
     w2 = -870*ones(1,N);
     w3 = 865*ones(1,N);
     w4 = -873*ones(1,N);
+    
+%     w1 = k*ones(1,N);
+%     w2 = -k*ones(1,N);
+%     w3 = k*ones(1,N);
+%     w4 = -k*ones(1,N);
     u0 = [w1;w2;w3;w4];
     
     iprint        = 5;
@@ -81,21 +86,21 @@ function [allData, t, x, u] = nmpcSystemArm
 %         end
 %         
 %           
-            e3 = (3-ang(1)) - e1;
-            e1 = (3-ang(1));
+            target = 1;
+            e3 = (target - ang(1)) - e1;
+            e1 = (target - ang(1));
             e2 = e2 + e1*T;
             
             
-            vel = 50*e1 + 0*e2 + 50*e3/T;
+            vel = 30*e1 + 0*e2 + 30*e3/T;
             
             
-            newSignal = (vel -velAng(1))*0.05;
+            newSignal = velAng(1) + 0.06*(vel -velAng(1));
             maxVal = 0.75;
             if ( newSignal > maxVal) newSignal = maxVal;
             elseif ( newSignal < -maxVal) newSignal = -maxVal;
             end
-                
-            controlSignal(1,k) = newSignal
+            controlSignal(1,k) = newSignal;
             
             %             controlSignal(1,k)
             
@@ -122,9 +127,9 @@ function [allData, t, x, u] = nmpcSystemArm
    
    pos = [scnsize(3)*0.5 scnsize(4) scnsize(3)/2.5 scnsize(4)/1.5];
      
-   graphArmReaction(allData,totalSamples,pos,4);
+   graphArmReaction(allData,totalSamples,pos,6);
    
-   graphArmStates(allData,totalSamples,pos,6);
+   graphArmStates(allData,totalSamples,pos,7);
     
    
    
@@ -148,6 +153,7 @@ function [allData, t, x, u] = nmpcSystemArm
    % fprintf('--------------------------------------------------\n'); 
     %fprintf('Evolucionando el Sistema\n');
     [y,totalTau] = mdlSystem(t,x(1,:),u(1:4,1),T,baseReaction);
+    
     
     % Actualizo las variables para el nmpc
     %fprintf('--------------------------------------------------\n'); 
@@ -387,7 +393,8 @@ function printInfo(state,allData,currSample)
     pos = [scnsize(3)*0.5 0 scnsize(3)/3 scnsize(4)/2.5];
     graphTotalTau(allData,currSample,pos,5);
     
-    
+%     graphQuadRotor(myData,pos,6)
+%     graphStates(myData,pos,4);
 end
 function graphIndividualStates(allData,currSample,pos,numFig)
     
@@ -498,9 +505,9 @@ function graphIndividualStates(allData,currSample,pos,numFig)
     
    
 end
-function graphStates(myData,pos)
+function graphStates(myData,pos,numFig)
     
-    fig = figure(1);
+    fig = figure(numFig);
     set(fig,'OuterPosition',pos) 
     subplot(2,2,1)
     hold on
@@ -551,10 +558,10 @@ function graphStates(myData,pos)
    
 end
 
-function graphQuadRotor(myData,pos)
+function graphQuadRotor(myData,pos,numFig)
     
   
-    fig = figure(2);
+    fig = figure(numFig);
     set(fig,'OuterPosition',pos) 
     clf;
     view(3)

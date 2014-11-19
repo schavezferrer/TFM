@@ -45,19 +45,22 @@ function [y,ttt] = mdlSystem(t, x, u, T, baseReaction)
     
     dn = iW*state(10:12); % Inertial frame
     
-    totalThrust = thrust(:,1) + thrust(:,2) + thrust(:,3) + thrust(:,4) + baseReaction(1:3,currSample); 
+    totalThrust = thrust(:,1) + thrust(:,2) + thrust(:,3) + thrust(:,4) - [baseReaction(1,currSample);baseReaction(2,currSample) ;-baseReaction(3,currSample)]; 
     
     dv = (quad.g*[0;0;1]  + R*(1/quad.M)*totalThrust); % Inertial Frame
  
     totalTau = tau(:,1)+tau(:,2)+tau(:,3)+tau(:,4);
     totalDrag = Q(:,1)+Q(:,2)+Q(:,3)+Q(:,4);
-    ttt = totalTau + baseReaction(4:6,currSample);
-    do = inv(quad.J)*(cross(-state(10:12),quad.J*state(10:12)) + totalTau + totalDrag +baseReaction(4:6,currSample)); % Body Frame ?
+    
+    ttt = totalDrag+totalTau - [-baseReaction(6,currSample);0;0];
+    ttt = totalTau;
+    
+    do = inv(quad.J)*(cross(-state(10:12),quad.J*state(10:12)) + totalTau + totalDrag  - [-baseReaction(6,currSample);0;0]*0); % Body Frame ?
     
     %UPDATE LINEAR VELOCITIES (Inertial Frame)
     linVel = state(7:9) + dv*T; 
     
-    %UPDATE ANGLES (Body Frame)
+    %UPDATE ANGLES (Body Frame) (x,y,z)
  
     angVel = state(10:12) + do*T;
     
