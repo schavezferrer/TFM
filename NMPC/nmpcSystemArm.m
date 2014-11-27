@@ -9,7 +9,7 @@ function [allData, t, x, u] = nmpcSystemArm
 
     mpciterations = 1; % Horizonte de prediccion
     N             = 8; % Horizonte de control
-    T             = 4/N; % Tiempo de muestreo
+    T             = 3/N; % Tiempo de muestreo
     tmeasure      = 0.0; 
     posIni = [0 0 -4]; % Posición inicial del quadrotor
     angIni = [0 0 0]; % Orientación inicial del quadrotor
@@ -23,15 +23,15 @@ function [allData, t, x, u] = nmpcSystemArm
     
     xmeasure = [posIni angIni linVelIni angVelIni];
     k = 900; % Velocidad angular de los motores inicial
-    w1 = 940*ones(1,N);
-    w2 = -870*ones(1,N);
-    w3 = 865*ones(1,N);
-    w4 = -873*ones(1,N);
+%     w1 = 940*ones(1,N);
+%     w2 = -870*ones(1,N);
+%     w3 = 865*ones(1,N);
+%     w4 = -873*ones(1,N);
     
-%     w1 = k*ones(1,N);
-%     w2 = -k*ones(1,N);
-%     w3 = k*ones(1,N);
-%     w4 = -k*ones(1,N);
+    w1 = k*ones(1,N);
+    w2 = -k*ones(1,N);
+    w3 = k*ones(1,N);
+    w4 = -k*ones(1,N);
     u0 = [w1;w2;w3;w4];
     
     iprint        = 5;
@@ -61,56 +61,62 @@ function [allData, t, x, u] = nmpcSystemArm
     velAng = [0 0 0 0 0 0];
     baseReaction = zeros(6,totalSamples+N);
     controlSignal = zeros(6,totalSamples+N);
-    e1 = 0;
-    e2 = 0;
-    e3 = 0;
     
-   for k = 1 : totalSamples+N
-% 
-%         if(k > 0 && k < 9)
-%             controlSignal(1,k) = 0.25;
-% %         elseif(k > 15 && k < 18)
-% %             controlSignal(1,k) = -0.05;
-%         end
+    e1 = zeros(1,6);
+    e2 = zeros(1,6);
+    e3 = zeros(1,6);
+    
+    [ang, velAng,accAng,reaction] = armPerturbation( ang, velAng, controlSignal(:,1)', T, arm);
 
-%         if(k > 1 && k < 15)
-%             controlSignal(1,k) = controlSignal(1,k-1) + (0.25 -  controlSignal(1,k-1))*T;
-%         elseif(k >= 15 && k < 25)
-%             controlSignal(1,k) = controlSignal(1,k-1) + (0 -  controlSignal(1,k-1))*T;
-%         end
-        
-%         if(k > 1 && k < 15)
-%             controlSignal(1,k) = (1 -  velAng(1))*0.1 + (1 -  velAng(1))*T;
-%         elseif(k >= 15)
-%             controlSignal(1,k) = (0 -  velAng(1))*0.1 + (0 -  velAng(1))*T;
-%         end
-%         
-%           
-            target = 1;
-            e3 = (target - ang(1)) - e1;
-            e1 = (target - ang(1));
-            e2 = e2 + e1*T;
+    baseReaction(:,1) = reaction;
+    armState = [ang velAng accAng'];
+
+    allData(1).armPerturbance = [baseReaction(1:3,1)/1 baseReaction(4:6,1)];
+    allData(1).armStates = armState;
+
+    
+   for k = 2 : totalSamples+N
+   
+        target = [1 1 1 1 1 1]*2;
+        e3 = (target - ang) - e1;
+        e1 = (target - ang);
+        e2 = e2 + e1*T;
             
             
-            vel = 30*e1 + 0*e2 + 30*e3/T;
+%             vel = 20*e1 + 0*e2 + 40*e3/T;
             
-            
-            newSignal = velAng(1) + 0.06*(vel -velAng(1));
-            maxVal = 0.75;
-            if ( newSignal > maxVal) newSignal = maxVal;
-            elseif ( newSignal < -maxVal) newSignal = -maxVal;
+        vel = [20 15 10 4 1 0.9].*e1 + [40 35 30 1 1 1].*e3/T;
+
+
+        newSignal = velAng*0 + [0.06 0.06 0.06 0.00015 0.0003 0.0002].*(vel - velAng);
+
+
+        maxVal = [0.75 0.75 0.75 0.75 0.75 0.75];
+
+        for i = 1:6
+
+            if ( newSignal(1,i) > maxVal(1,i)) newSignal(1,i) = maxVal(1,i);
+            elseif ( newSignal(1,i) < -maxVal(1,i)) newSignal(1,i) = -maxVal(1,i);
             end
-            controlSignal(1,k) = newSignal;
+            controlSignal(i,k) = newSignal(1,i);
+
+        end
+%             controlSignal(:,k)
+%             i = 2;
+%             if ( newSignal(i) > maxVal(i)) newSignal(i) = maxVal(i);
+%             elseif ( newSignal(i) < -maxVal(i)) newSignal(i) = -maxVal(i);
+%             end
+%             controlSignal(i,k) = newSignal(i);
             
-            %             controlSignal(1,k)
+                       
             
 %         elseif(k >= 15)
 %             controlSignal(1,k) = (0 -  ang(1))*0.001 + 5*(0 -  ang(1))*T;
        
         
-        
-        
-        
+%         
+%         
+%         
         [ang, velAng,accAng,reaction] = armPerturbation( ang, velAng, controlSignal(:,k)', T, arm);
    
         baseReaction(:,k) = reaction;
@@ -241,9 +247,9 @@ function [c,ceq] = constraints(t, x, u,N)
     k = 0.1;
     v = 1;
    
-    ub = [ 100 100 100 k k k v v 10 1 1 1 ];
+    ub = [ 100 100 100 k*10 k k v v 10 1 1 1 ];
        
-    lb = [-100 -100 -100 -k -k -k -v -v -10 -1 -1 -1];
+    lb = [-100 -100 -100 -k*10 -k -k -v -v -10 -1 -1 -1];
     
     [nothing numVar] = size(x);
     
@@ -282,12 +288,12 @@ function [A, b, Aeq, beq, lb, ub] = linearconstraints(t, x, u, lastU)
          0 0 0 1;
          0 0 0 -1];
    
-    k = 150;
+    k = 300;
     b = [k+lastU(1,1) k-lastU(1,1) k+lastU(2,1) k-lastU(2,1) k+lastU(3,1) k-lastU(3,1) k+lastU(4,1) k-lastU(4,1)]; 
     
 %     b = [];
 %     A = [];
-    min = 200;
+    min = 600;
     max = 2000;
     Aeq = [];
     beq = []; 
@@ -385,7 +391,7 @@ function printInfo(state,allData,currSample)
     graphFval(allData,currSample,pos,2);
     
     pos = [scnsize(3)*0 scnsize(4) scnsize(3)/2.5 scnsize(4)/1.5];
-    graphIndividualStates(allData,currSample,pos,3)
+    graphIndividualStates(allData,currSample,pos,3);
     
 %     pos = [scnsize(3)*0.5 scnsize(4) scnsize(3)/2.5 scnsize(4)/1.5];
 %     graphArmReaction(allData,currSample,pos,4);
@@ -396,6 +402,7 @@ function printInfo(state,allData,currSample)
 %     graphQuadRotor(myData,pos,6)
 %     graphStates(myData,pos,4);
 end
+
 function graphIndividualStates(allData,currSample,pos,numFig)
     
     myData = zeros(currSample,12);
@@ -459,7 +466,7 @@ function graphIndividualStates(allData,currSample,pos,numFig)
     xlabel('Sample')
     ylabel('Pitch')
     grid on
-    plot(myData(:,4),'r+-')
+    plot(myData(:,5),'r+-')
     drawnow
     
     subplot(6,2,9)
@@ -467,7 +474,7 @@ function graphIndividualStates(allData,currSample,pos,numFig)
     xlabel('Sample')
     ylabel('Roll')
     grid on
-    plot(myData(:,5),'g+-')
+    plot(myData(:,6),'g+-')
     drawnow
     
     subplot(6,2,11)
@@ -475,7 +482,7 @@ function graphIndividualStates(allData,currSample,pos,numFig)
     xlabel('Sample')
     ylabel('Yaw')
     grid on
-    plot(myData(:,6),'b+-')
+    plot(myData(:,4),'b+-')
     drawnow
     
     subplot(6,2,8)
@@ -505,6 +512,7 @@ function graphIndividualStates(allData,currSample,pos,numFig)
     
    
 end
+
 function graphStates(myData,pos,numFig)
     
     fig = figure(numFig);
@@ -626,7 +634,6 @@ function graphQuadRotor(myData,pos,numFig)
     
 end
 
-
 function graphU(allData, currSample,pos,numFig)
 
     uOpt = zeros(currSample,8);
@@ -733,7 +740,6 @@ function graphArmReaction(allData, currSample,pos,numFig)
     
 
 end
-
 
 function graphTotalTau(allData, currSample,pos,numFig)
 

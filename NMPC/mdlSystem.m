@@ -52,10 +52,10 @@ function [y,ttt] = mdlSystem(t, x, u, T, baseReaction)
     totalTau = tau(:,1)+tau(:,2)+tau(:,3)+tau(:,4);
     totalDrag = Q(:,1)+Q(:,2)+Q(:,3)+Q(:,4);
     
-    ttt = totalDrag+totalTau - [-baseReaction(6,currSample);0;0];
-    ttt = totalTau;
+    ttt = [totalDrag(3);baseReaction(6,currSample);totalDrag(3)+baseReaction(6,currSample)];
     
-    do = inv(quad.J)*(cross(-state(10:12),quad.J*state(10:12)) + totalTau + totalDrag  - [-baseReaction(6,currSample);0;0]*0); % Body Frame ?
+    
+    do = inv(quad.J)*(cross(-state(10:12),quad.J*state(10:12)) + totalTau + totalDrag  - [baseReaction(4,currSample);baseReaction(5,currSample);-baseReaction(6,currSample)]); % Body Frame ?
     
     %UPDATE LINEAR VELOCITIES (Inertial Frame)
     linVel = state(7:9) + dv*T; 
