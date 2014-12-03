@@ -36,7 +36,7 @@ function [allData, t, x, u] = nmpcSystemArm
     
     iprint        = 5;
     tol_opt       = 1e-8;
-    opt_option    = 0;
+    opt_option    = 2;
     type          = 'difference equation';
     atol_ode_real = [];
     rtol_ode_real = [];
@@ -77,7 +77,7 @@ function [allData, t, x, u] = nmpcSystemArm
     
    for k = 2 : totalSamples+N
    
-        target = [1 1 1 1 1 1]*2;
+        target = [1 1 1 1 1 1]*1;
         e3 = (target - ang) - e1;
         e1 = (target - ang);
         e2 = e2 + e1*T;
@@ -247,9 +247,9 @@ function [c,ceq] = constraints(t, x, u,N)
     k = 0.1;
     v = 1;
    
-    ub = [ 100 100 100 k*10 k k v v 10 1 1 1 ];
+    ub = [ 5 5 5 k*10 k k v v 10 1 1 1 ];
        
-    lb = [-100 -100 -100 -k*10 -k -k -v -v -10 -1 -1 -1];
+    lb = [-5 -5 -5 -k*10 -k -k -v -v -10 -1 -1 -1];
     
     [nothing numVar] = size(x);
     
