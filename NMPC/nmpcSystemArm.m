@@ -8,7 +8,7 @@ function [allData, t, x, u] = nmpcSystemArm
     close all;
 
     mpciterations = 1; % Horizonte de prediccion
-    N             = 8; % Horizonte de control
+    N             = 10; % Horizonte de control
     T             = 3/N; % Tiempo de muestreo
     tmeasure      = 0.0; 
     posIni = [0 0 -4]; % Posición inicial del quadrotor
