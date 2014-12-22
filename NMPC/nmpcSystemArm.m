@@ -55,16 +55,16 @@ function [allData, t, x, u] = nmpcSystemArm
     lastU = u0(1:4,1);
     
 
-    mdl_armParam;
+    mdl_armParam7;
     
-    ang = [0 0 0 0 0 0];
-    velAng = [0 0 0 0 0 0];
+    ang = [0 0 0 0 0 0 0];
+    velAng = [0 0 0 0 0 0 0];
     baseReaction = zeros(6,totalSamples+N);
-    controlSignal = zeros(6,totalSamples+N);
+    controlSignal = zeros(7,totalSamples+N);
     
-    e1 = zeros(1,6);
-    e2 = zeros(1,6);
-    e3 = zeros(1,6);
+    e1 = zeros(1,7);
+    e2 = zeros(1,7);
+    e3 = zeros(1,7);
     
     [ang, velAng,accAng,reaction] = armPerturbation( ang, velAng, controlSignal(:,1)', T, arm);
 
@@ -77,7 +77,7 @@ function [allData, t, x, u] = nmpcSystemArm
     
    for k = 2 : totalSamples+N
    
-        target = [1 1 1 1 1 1]*1;
+        target = [0 1 1 1 1 1 1]*1;
         e3 = (target - ang) - e1;
         e1 = (target - ang);
         e2 = e2 + e1*T;
@@ -85,15 +85,15 @@ function [allData, t, x, u] = nmpcSystemArm
             
 %             vel = 20*e1 + 0*e2 + 40*e3/T;
             
-        vel = [20 15 10 4 1 0.9].*e1 + [40 35 30 1 1 1].*e3/T;
+        vel = 0.1*[0 20 20 10 4 1 0.9].*e1 + 0.1*[0 40 40 30 1 1 1].*e3/T;
 
 
-        newSignal = velAng*0 + [0.06 0.06 0.06 0.00015 0.0003 0.0002].*(vel - velAng);
+        newSignal = velAng*0 + [0 0.06 0.06 0.06 0.00015 0.0003 0.0002].*(vel - velAng);
 
 
-        maxVal = [0.75 0.75 0.75 0.75 0.75 0.75];
+        maxVal = [0 0.75 0.75 0.75 0.75 0.75 0.75];
 
-        for i = 1:6
+        for i = 2:7
 
             if ( newSignal(1,i) > maxVal(1,i)) newSignal(1,i) = maxVal(1,i);
             elseif ( newSignal(1,i) < -maxVal(1,i)) newSignal(1,i) = -maxVal(1,i);
@@ -794,7 +794,7 @@ end
 
 function graphArmStates(allData, currSample,pos,numFig)
 
-    armStates = zeros(currSample,18);
+    armStates = zeros(currSample,21);
     
     for i = 1:currSample
       armStates(i,:) = allData(i).armStates;
@@ -803,11 +803,11 @@ function graphArmStates(allData, currSample,pos,numFig)
     
     
         
-        for k = 1 : 6
+        for k = 1 : 7
 
             for j = 1:3
 
-                subplot(6,3,j+(k-1)*3)
+                subplot(7,3,j+(k-1)*3)
                 grid on
                 hold on
                 if j == 1 
@@ -817,12 +817,12 @@ function graphArmStates(allData, currSample,pos,numFig)
                 end
                 if j == 2
 
-                    plot(armStates(:,k+6),'g')
+                    plot(armStates(:,k+7),'g')
 
                 end
                 if j == 3
 
-                    plot(armStates(:,k+12),'b')
+                    plot(armStates(:,k+14),'b')
 
                 end
 
