@@ -1,7 +1,10 @@
 
 
-function [y] = realSystem(t, x, u, T, baseReaction)
+function [y,ttt] = realSystem(t, x, u, T, baseReaction)
   
+    
+    currSample = t/T + 1;
+    currSample = floor(currSample);
     
     mdl_quadcopterParam
     
@@ -62,14 +65,17 @@ function [y] = realSystem(t, x, u, T, baseReaction)
     
     dn = iW*state(10:12); % Inertial frame
     
-    totalThrust = thrust(:,1) + thrust(:,2) + thrust(:,3) + thrust(:,4)  + baseReaction(1:3);
+    totalThrust = thrust(:,1) + thrust(:,2) + thrust(:,3) + thrust(:,4)   - [baseReaction(1,currSample);baseReaction(2,currSample) ;-baseReaction(3,currSample)]; 
     
     dv = (quad.g*[0;0;1]  + R*(1/quad.M)*totalThrust); % Inertial Frame
  
     totalTau = tau(:,1)+tau(:,2)+tau(:,3)+tau(:,4);
     totalDrag = Q(:,1)+Q(:,2)+Q(:,3)+Q(:,4);
     
-    do = inv(quad.J)*(cross(-state(10:12),quad.J*state(10:12)) + totalTau + totalDrag + baseReaction(4:6)); % Body Frame ?
+    ttt = [totalDrag(3);baseReaction(6,currSample);totalDrag(3)+baseReaction(6,currSample)];
+
+    
+    do = inv(quad.J)*(cross(-state(10:12),quad.J*state(10:12)) + totalTau + totalDrag  - [baseReaction(4,currSample);baseReaction(5,currSample);-baseReaction(6,currSample)]); % Body Frame ?
     
     %UPDATE LINEAR VELOCITIES (Inertial Frame)
     linVel = state(7:9) + dv*T; 
@@ -85,6 +91,13 @@ function [y] = realSystem(t, x, u, T, baseReaction)
     ang = state(4:6) + dn*T; 
         
     %POST UPDATE
+    
+      if pos(3) > 0
+        pos(3) = 0;
+%         if(linVel(3) > 0)
+%             linVel(3) = 0;
+%         end
+    end
     y = [pos' ang' linVel' angVel']; 
     
    

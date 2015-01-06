@@ -10,12 +10,11 @@ function [ ang, vel,accAng,baseReaction] = armPerturbation( ang, vel, controlSig
    accAng = arm.accel(ang,vel,arm.gravload(ang)+controlSignal+(c*vel')');
 %    vel = controlSignal;
 %    accAng = arm.accel(ang,vel,arm.gravload(ang));
-    accAng(1) = 0;
+   accAng(1) = 0;
    vel = vel + (accAng)'*Ts;
    ang = ang + vel*Ts;
    
    [~ , baseReaction] = arm.rne(ang,vel,accAng');
-    
 %    baseReaction(4) = baseReaction(3) - baseReaction(2)*0.1
 %    baseReaction(4) = baseReaction(4) + baseReaction(1)*0.1
 

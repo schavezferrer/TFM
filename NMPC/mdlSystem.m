@@ -4,6 +4,7 @@ function [y,ttt] = mdlSystem(t, x, u, T, baseReaction)
   
     currSample = t/T + 1;
     currSample = floor(currSample);
+  
     mdl_quadcopterParam
 
  
@@ -71,6 +72,14 @@ function [y,ttt] = mdlSystem(t, x, u, T, baseReaction)
     ang = state(4:6) + dn*T; 
         
     %POST UPDATE
+    
+    if pos(3) > 0
+        pos(3) = 0;
+%         if(linVel(3) > 0)
+%             linVel(3) = 0;
+%         end
+    end
+    
     y = [pos' ang' linVel' angVel']; 
     
    

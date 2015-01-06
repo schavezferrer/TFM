@@ -8,7 +8,7 @@ function [allData, t, x, u] = nmpcSystemArm
     close all;
 
     mpciterations = 1; % Horizonte de prediccion
-    N             = 10; % Horizonte de control
+    N             = 3; % Horizonte de control
     T             = 0.2; % Tiempo de muestreo
     tmeasure      = 0.0; 
     posIni = [0 0 0]; % Posición inicial del quadrotor
@@ -79,7 +79,7 @@ function [allData, t, x, u] = nmpcSystemArm
    for k = 2 : totalSamples+N+1
         
         if l> 25 && l < 200 
-            target = [0 1 1 1 1 1 1]*0.0;
+            target = [0 1 1 1 1 1 1]*0.2*0;
             allTarget(k,:) = target;
         elseif l > 200
             target = [0 2 2 2 2 2 2]*0;
@@ -141,7 +141,7 @@ function [allData, t, x, u] = nmpcSystemArm
     x = xmeasure;
     u = u0';
     y = xmeasure;
-    fval = runningcosts(t, x, u, u)
+    fval = runningcosts(t, x, u, u);
     while currTime <= timeSim
     % fprintf('--------------------------------------------------\n'); 
     % Aplico el nmpc
@@ -157,22 +157,21 @@ function [allData, t, x, u] = nmpcSystemArm
          allData(currSample).uPredicted = u;
     end
     
-    allData(currSample).xReal = y;
+        allData(currSample).xReal = y;
     allData(currSample).sampleTime = T;
     allData(currSample).currTime = tmeasure;
     
-%     if currSample > 1 &&  abs(allData(currSample-1).fval - fval)/allData(currSample-1).fval > 200 
-%          if allData(currSample-1).fval - fval < 0
-%           allData(currSample).fval =   1.2*allData(currSample-1).fval;
-%          else
-%            allData(currSample).fval =  fval;
-%          end
-%      
-%     else 
-        
+    if currSample > 1 &&  abs(allData(currSample-1).fval - fval)/allData(currSample-1).fval > 8 
+         if allData(currSample-1).fval - fval < 0
+          allData(currSample).fval =   1.2*allData(currSample-1).fval;
+         else
+           allData(currSample).fval =  fval;
+         end
+     
+    else 
             allData(currSample).fval = fval;
 
-%     end
+    end
     
 %    allData(currSample).totalTau = totalTau;
     if currSample > 1 
@@ -186,7 +185,7 @@ function [allData, t, x, u] = nmpcSystemArm
          mpciterations, N, T, tmeasure, xmeasure, u0,lastU,baseReaction, ...
          tol_opt, opt_option, ...
          type, atol_ode_real, rtol_ode_real, atol_ode_sim, rtol_ode_sim, ...
-         iprint, @printHeader, @printClosedloopData, @plotTrajectories);
+         iprint, @printHeader, @printClosedloopData, @plotTrajectories)
 
     % Evoluciono el sistema
    % fprintf('--------------------------------------------------\n'); 
@@ -423,7 +422,6 @@ function graphIndividualStates(allData,currSample,pos,numFig,Ts)
     ylabel('Position X')
     grid on
     plot([1:currSample]*Ts,myData(:,1),'r+-')
-     axis tight
     drawnow
     
     subplot(6,2,3)
@@ -432,7 +430,6 @@ function graphIndividualStates(allData,currSample,pos,numFig,Ts)
     ylabel('Position Y')
     grid on
     plot([1:currSample]*Ts,myData(:,2),'g+-')
-     axis tight
     drawnow
     
     subplot(6,2,5)
@@ -818,7 +815,7 @@ function graphFval(allData, currSample,pos,numFig,Ts)
 %     set(fig,'OuterPosition',pos) 
    
     bar([1:currSample]*Ts,fval(:,1),'b')
-    axis tight
+     axis tight
     xlabel('Time')
     ylabel('Cost Function Value')
     grid on
@@ -898,7 +895,7 @@ function graphISE(allData, currSample,numFig,Ts)
     figure(numFig)
     
     bar([1:currSample]*Ts,ISE(:,1))
-    axis tight
+     axis tight
     title('Integral of the Square of the Error')
     xlabel('Time');
     ylabel('ISE');
