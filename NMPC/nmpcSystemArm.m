@@ -11,7 +11,7 @@ function [allData, t, x, u] = nmpcSystemArm
     N             = 10; % Horizonte de control
     T             = 0.2; % Tiempo de muestreo
     tmeasure      = 0.0; 
-    posIni = [0 0 0]; % Posición inicial del quadrotor
+    posIni = [0 0 -4]; % Posición inicial del quadrotor
     angIni = [0 0 0]; % Orientación inicial del quadrotor
     linVelIni = [0 0 0]; % Velocidad lineal inicial del quadrotor
     angVelIni = [0 0 0]; % Velocidad angular inicial del quadrotor
@@ -22,7 +22,7 @@ function [allData, t, x, u] = nmpcSystemArm
     yAnt = [];
     
     xmeasure = [posIni angIni linVelIni angVelIni];
-    k = 200; % Velocidad angular de los motores inicial
+    k = 900; % Velocidad angular de los motores inicial
 %     w1 = 940*ones(1,N);
 %     w2 = -870*ones(1,N);
 %     w3 = 865*ones(1,N);
