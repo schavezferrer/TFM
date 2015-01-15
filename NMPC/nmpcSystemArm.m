@@ -8,8 +8,8 @@ function [allData, t, x, u] = nmpcSystemArm
     close all;
 
     mpciterations = 1; % Horizonte de prediccion
-    N             = 10; % Horizonte de control
-    T             = 0.2; % Tiempo de muestreo
+    N             = 12; % Horizonte de control
+    T             = 0.4; % Tiempo de muestreo
     tmeasure      = 0.0; 
     posIni = [0 0 -4]; % Posición inicial del quadrotor
     angIni = [0 0 0]; % Orientación inicial del quadrotor
@@ -78,8 +78,8 @@ function [allData, t, x, u] = nmpcSystemArm
     target = [0 0 0 0 0 0 0];
    for k = 2 : totalSamples+N+1
         
-        if l> 25 && l < 200 
-            target = [0 1 1 1 1 1 1]*0.0;
+        if l> 2 && l < 200 
+            target = [0 1 1 1 1 1 1]*0.2;
             allTarget(k,:) = target;
         elseif l > 200
             target = [0 2 2 2 2 2 2]*0;

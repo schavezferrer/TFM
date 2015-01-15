@@ -1,0 +1,119 @@
+{\rtf1\ansi\deff3\adeflang1025
+{\fonttbl{\f0\froman\fprq2\fcharset0 Times New Roman;}{\f1\froman\fprq2\fcharset2 Symbol;}{\f2\fswiss\fprq2\fcharset0 Arial;}{\f3\fswiss\fprq0\fcharset0 Calibri;}{\f4\fnil\fprq2\fcharset0 Mangal;}{\f5\fnil\fprq0\fcharset128 Mangal;}{\f6\fnil\fprq2\fcharset0 Microsoft YaHei;}}
+{\colortbl;\red0\green0\blue0;\red128\green128\blue128;}
+{\stylesheet{\s0\snext0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082 Per defecte;}
+{\s15\sbasedon0\snext16{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\sb240\sa120\keepn\cf0\hich\af4\langfe2052\dbch\af6\loch\f2\fs28\lang1027 Encapçalament;}
+{\s16\sbasedon0\snext16{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\sb0\sa120\cf0\hich\af3\langfe2052\dbch\af3\loch\f3\fs24\lang1027 Cos del text;}
+{\s17\sbasedon16\snext17{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\sb0\sa120\cf0\hich\af5\langfe2052\dbch\af3\loch\f3\fs24\lang1027 Llista;}
+{\s18\sbasedon0\snext18{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\sb120\sa120\cf0\i\hich\af5\langfe2052\dbch\af3\ai\loch\f3\fs24\lang1027 Llegenda;}
+{\s19\sbasedon0\snext19{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\cf0\hich\af5\langfe2052\dbch\af3\loch\f3\fs24\lang1027 Índex;}
+}{\info{\creatim\yr0\mo0\dy0\hr0\min0}{\revtim\yr0\mo0\dy0\hr0\min0}{\printim\yr0\mo0\dy0\hr0\min0}{\comment OpenOffice}{\vern4110}}\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720\deftab720
+
+{\*\pgdsctbl
+{\pgdsc0\pgdscuse195\pgwsxn12240\pghsxn15840\marglsxn1800\margrsxn1800\margtsxn1440\margbsxn1440\pgdscnxt0 Per defecte;}}
+\formshade{\*\pgdscno0}\paperh15840\paperw12240\margl1800\margr1800\margt1440\margb1440\sectd\sbknone\sectunlocked1\pgndec\pgwsxn12240\pghsxn15840\marglsxn1800\margrsxn1800\margtsxn1440\margbsxn1440\ftnbj\ftnstart1\ftnrstcont\ftnnar\aenddoc\aftnrstcont\aftnstart1\aftnnrlc
+\pgndec\pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+Finally, the last element necessary to control a quadrotor equipped with an arm, is it's control algorithm. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+At the beginning, a black box model was selected as the dynamic model of the whole system, so the first try was study the problem as generic as possible. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+After realizing that there are a strong coupled effects between the quadrotor and an arm, a different strategy was chosen. Those coupled effects prevented from finding a relation between the dynamics of the quadrotor and the dynamics of the robotic arm.}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+As the dynamic model of a quadrotor and an arm is well known, a black box model could be discarded in order to use parametrized models.Once the model type has been chosen, the whole problem could be solved as an optimization one.}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+Standard approaches to quadrotor control have been based on linear controller design. These methods include proportional integral derivative (PID) controllers (\\cite\{lib37\}), linear quadratic regulator (LQR) (\\cite\{lib38\}) or a robust $H_\\infty$. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+Another method used, consists in linearize the model around a certain state of the quadrotor and then applying a predictive control model around this point (\\cite\{lib3\}), (\\cite\{lib8\}).}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+A MPC has the ability to anticipate future events and can take coordinated actions by using dynamic models of the process. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+This algorithm is based on an iterative process which solves an optimization problem along a finite horizon. For each time $t$, the current plant state is sampled by using a linear model, and a minimizing of a cost function is computed for a short time horizon in the future $[t,t+T]$ (control horizon). Once the problem is solved a vector of control signals is found. This vector is the trajectory of the control signals that minimize the cost function along the control horizon. From all this vector, only the control signals corresponding to the time $t$ are applied to the real plant in the evolution of the system. Then, a new value of the state variables of the plant is obtained and the algorithm is repeated again $t$. In the figure (\\ref\{MPCScheme\}) a brief scheme of the process is shown.}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\rtlch \ltrch\loch\lang1033
+}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\begin\{figure\}[!htbp]}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\fs22\lang1033
+   }{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\centering}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\fs22\lang1033
+     }{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\includegraphics[width = 100mm]\{MPCscheme\}}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\fs22\lang1033
+     }{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\caption\{Scheme of MPC algorithm\}}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\fs22\lang1033
+    }{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\label\{MPCScheme\}}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\end\{figure\}}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\rtlch \ltrch\loch\lang1033
+}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+The cost function to minimize involves all the state variables and the control signals as follows: }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+$$ J=\\sum_\{i=1\}^N \\gamma_\{x_i\} (x_\{desired\}-x_i)^2 + \\sum_\{i=1\}^N \\gamma_\{u_i\} \{\\Delta u_i\}^2 $$}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\rtlch \ltrch\loch\lang1033
+}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+Where $x_i$ is the state variable $i$-th, the $x_\{desired\}$ is the reference of the state variable $i$-th, the $u_i$ is the control signal $i$-th, the $\\gamma_\{x_i\}$ is the  reltive weight of the state variable $i$-th,  $\\gamma_\{u_i\}$ is the relative weight of the control signal $i$-th and $N$ is the control horizon length. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+Also different types of cost function could be added to obtain the desired performance. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+The minimization of the cost function is subjected to some certain constraints defined by the designer in order to determine a state-space where the problem should be solved. To obtain the state variables in a future prediction, is necessary a mathematical model of the plant. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+The main restriction of this method is that the modeled plant used on the minimization of the cost function should be linear. This method ignores most of the dynamic effects of the system and also cannot represent accurately the real behavior of the quadrotor. I's also difficult to add a new model or perturbation with this strategy.}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+There is a variant of this algorithm for more complex systems called Nonlinear Model Predictive Control. Adding the nonlinear part improves the response of the system at the expense of increasing the necessary computational burden.}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+The numerical solution of the NMPC optimal control problems is typically based on direct optimal control methods using Newton-type optimization schemes. NMPC algorithms typically take advantage of the fact that consecutive optimal control problems are similar to each other.}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+This allows to initialize the Newton-type solution procedure efficiently by a suitable shifted guess from the previously computed optimal solution, saving considerable amounts of computation time.}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+A scheme of the global workflow is presented in the figure (\\ref\{NMPCDiagram\}). }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\begin\{figure\}[!htbp]}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\fs22\lang1033
+   }{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\centering}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\fs22\lang1033
+     }{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\includegraphics[width = 125mm]\{NMPCDiagram\}}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\fs22\lang1033
+     }{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\caption\{NMPC scheme\}}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\fs22\lang1033
+    }{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\label\{NMPCDiagram\}}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\end\{figure\}}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\begin\{description\}}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\item[Plant:] System to be controlled.}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\item[State Estimator:] Make a estimation of the state variables.}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\item[Dynamic Optimazer:] Solve the optimal problem.}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\item[System Model:] Mathematical model of the behavior of the plant. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\item[Cost Function:] Function that should be minimized. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\item[Constraints:] Restrictions that should be respected to solve the optimal problem. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+\\end\{description\}}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\rtlch \ltrch\loch\lang1033
+}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+The Nonlinear Model Predictive Control algorithm has been chosen to control the quadrotor equpped with an arm. A more detailed explanation is presented in chapter 3. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+On the other hand, the robotic arm has been treated as a dynamic perturbation of the quadrotor, so there is no need to control its joints. Nevertheless, is necessary to know the exact model of the arm to calculate the dynamic reactions applied to the quadrotor due to the motion of the arm during its trajectory. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+The trajectory of the arm and their perturbations are calculated before applying the NMPC algorithm, so it turns out as a parameter of the system. This means that for each instant of time is possible to know the reaction of the arm into the quadrotor. As the aim of the Thesis is to compensate this perturbation, a predictive algorithm is used to minimize the error. }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+The main problem of the strategy in a real case is that a good estimation of the state variables of the quadrotor it is necessary. However, this project is developed in a simulation environment, so it's possible to obtain the state variables of the plant by using a model of the system.  }
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\rtlch \ltrch\loch\lang1033
+}
+\par \pard\plain \s0{\*\hyphen2\hyphlead2\hyphtrail2\hyphmax0}\nowidctlpar\cf0\hich\af3\langfe3082\dbch\af3\afs24\lang1081\loch\f3\fs24\lang3082\sl276\slmult1\sb0\sa200{\afs22\rtlch \ltrch\loch\fs22\lang1033
+During the next chapters, a more detailed specification of the problem will be presented.}
+\par }

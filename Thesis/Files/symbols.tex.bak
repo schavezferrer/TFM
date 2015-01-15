@@ -1,0 +1,53 @@
+\listofnomenclature{lll} % Include a list of Symbols (a three column table)
+{ %\dotfill
+$A$ & Electrode area & m$^{2}$ \\
+$C$ & Volumetric capacitance & C V$^{-1}$ m$^{-3}$ \\
+$c$ & Concentration & mol m$^{-3}$ \\
+$D_{i,k}^{eff}$ & Diffusion coefficient & m$^{2}$ s$^{-1}$ \\
+$D_{W}$ & Self-diffusion coefficient of water in the membrane & m$^{2}$ s$^{-1}$ \\
+%$e$ & Specific total energy & J kg$^{-1}$ \\
+%$f_i$ & Right-hand side of the balance equation for inventory $\nu_i$ & \\
+$f^{V}$ & Surface enlargement factor & \\
+$h$ & Molar enthalpy & J mol$^{-1}$ \\
+$I$ & Electrical current & A \\
+$i$ & Current density & A m$^{-2}$ \\
+$L$ & Length & m \\
+$M$ & Molar mass & g mol$^{-1}$ \\
+%$\dot{N}$ & Molar flux density & mol m$^{-1}$ s$^{-1}$ \\
+$\dot{n}$ & Molar flux density & mol m$^{-1}$ s$^{-1}$ \\
+$n_{Vol}$ & Number of discretization volumes & \\
+$P$ & Electrical power & W \\
+$p$ & Pressure & Pa \\
+$r$ & Reaction rate & mol m$^{-2}$ s$^{-1}$ \\
+$t$ & Time & s \\
+$t_W$ & Transport number of water in the membrane & \\
+$T$ & Temperature & K \\
+$U$ & Voltage & V \\
+$u$ & Specific internal energy & J kg$^{-1}$ \\
+%$\textbf{u}$ & Vector of fictitious inputs & \\
+%$\textbf{u}_{phys}$ & Vector of physical inputs & \\
+$v$ & Flow velocity & m s$^{-1}$ \\
+%$\nu_i$ & Inventory & \\
+$x$ & Space coordinate & m \\
+$y$ & Space coordinate & m \\
+%$\textbf{y}$ & Vector of fictitious outputs & \\
+$z$ & Space coordinat & m \\
+
+
+% Symbol & Name & Unit \\
+
+& & \\ % Gap to separate the Roman symbols from the Greek
+
+$\alpha$ & Heat transfer coefficient & W m$^{-2}$ K$^{-1}$ \\
+$\delta$ & Thickness of layer in y-direction & m \\
+%$\eta$ & Vector of measurements & \\
+$\kappa$ & Electrical conductivity of the membrane & $\Omega^{-1}$ m$^{-1}$ \\
+$\lambda$ & Heat conductivity & W K$^{-1}$ m$^{-2}$ \\
+$\Lambda$ & Water content & \\
+$\mu$ & Electrochemical potential & J mol$^{-1}$ \\
+$\xi$ & Mole fraction & \\
+$\rho$ & Density & kg m$^{-3}$ \\
+$\Phi$ & Electrical potential & V \\
+%$\tau$ & Time constant in feedback law & s \\
+% Symbol & Name & Unit \\
+}
